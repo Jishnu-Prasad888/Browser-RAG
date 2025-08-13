@@ -1,0 +1,5 @@
+__pycache__/
+.vscode/
+browser_history_db/
+chroma_db/
+page_chunks_db/
