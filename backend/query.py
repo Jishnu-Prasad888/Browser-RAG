@@ -33,7 +33,7 @@ def ask_ollama(question: str, context: str) -> str:
     """Send the question + retrieved context to Ollama."""
     prompt = f"""You are an AI assistant. 
     Use the following context from the user's browsing history to answer the question.
-    If you don't know the answer, say you don't know. Do not answer if the answer cant be found in the context
+    If you don't know the answer, say you don't know. Do not answer if the answer cant be found in the context.Only answer from the context if the  context is not sufficient tell the user that you dont have the required data do not in any case answer the user if the context is not sufficient
 
     Context:
     {context}

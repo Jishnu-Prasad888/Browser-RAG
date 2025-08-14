@@ -3,3 +3,4 @@ __pycache__/
 browser_history_db/
 chroma_db/
 page_chunks_db/
+frontend/node_modules
