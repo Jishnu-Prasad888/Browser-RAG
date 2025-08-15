@@ -30,17 +30,25 @@ def query_knowledge_base(question: str, n_results=RETRIEVAL_LIMIT):
     return documents
 
 def ask_ollama(question: str, context: str) -> str:
-    """Send the question + retrieved context to Ollama."""
-    prompt = f"""You are an AI assistant. 
-    Use the following context from the user's browsing history to answer the question.
-    If you don't know the answer, say you don't know. Do not answer if the answer cant be found in the context.Only answer from the context if the  context is not sufficient tell the user that you dont have the required data do not in any case answer the user if the context is not sufficient
+    prompt = f"""
+    You are an AI assistant that answers questions strictly based on the provided context. 
+    Your responses must be in Markdown format.
+
+    Instructions:
+    - Use only the information from the given context to answer the user's question.
+    - If the context does not contain enough information to answer, respond with: 
+      "I don't have enough information in the context to answer that question."
+    - Do not make assumptions or provide information not present in the context.
+    - Answer in Markdown only; do not include anything outside of Markdown formatting.
 
     Context:
     {context}
 
     Question: {question}
+
     Answer:
     """
+
     
     process = subprocess.Popen(
         ["ollama", "run", OLLAMA_MODEL],
@@ -50,6 +58,7 @@ def ask_ollama(question: str, context: str) -> str:
         text=True
     )
     output, _ = process.communicate(prompt)
+    print(output.strip())
     return output.strip()
 
 if __name__ == "__main__":

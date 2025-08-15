@@ -72,3 +72,18 @@ def chat(req: ChatRequest):
     conn.close()
 
     return {"response": answer}
+
+
+# Add this to your main.py
+@app.delete("/api/conversations/{conversation_id}")
+def delete_conversation(conversation_id: int):
+    conn = sqlite3.connect("chat.db")
+    c = conn.cursor()
+    
+    # Delete messages first to maintain referential integrity
+    c.execute("DELETE FROM messages WHERE conversation_id=?", (conversation_id,))
+    c.execute("DELETE FROM conversations WHERE id=?", (conversation_id,))
+    
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
