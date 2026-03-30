@@ -5,3 +5,4 @@ chroma_db/
 page_chunks_db/
 frontend/node_modules
 chat.db
+backend/venv
