@@ -22,6 +22,7 @@ class ChatRequest(BaseModel):
     conversation_id: int
     message: str
 
+
 @app.post("/api/conversations")
 def create_conversation():
     conn = sqlite3.connect("chat.db")
