@@ -129,6 +129,8 @@ FIREFOX_PROFILE_DIRS = {
         r"%APPDATA%\Mozilla\Firefox\Profiles",  # kept consistent; snap/flatpak not common on Windows
     ],
     "Linux": [
+        "~/.config/mozilla/firefox",
+        
         "~/.mozilla/firefox",
         "~/.mozilla/firefox-esr",
         # Snap
@@ -192,7 +194,9 @@ def get_firefox_history():
         if not os.path.isdir(parent):
             continue
         # Match *.default*, *.default-release*, *.default-esr*, etc.
-        for profile_dir in glob.glob(os.path.join(parent, "*.default*")):
+        for profile_dir in glob.glob(os.path.join(parent, "*")):
+            if not os.path.isdir(profile_dir):
+                    continue
             db_path = os.path.join(profile_dir, "places.sqlite")
             if db_path in seen_paths or not os.path.exists(db_path):
                 continue
