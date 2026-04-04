@@ -609,52 +609,54 @@ const ChatInterface: React.FC = () => {
   };
 
   // ── Send ───────────────────────────────────────────────────────────────────
-  const sendQuery = async () => {
-    if (!query.trim() || isLoading) return;
+const sendQuery = async () => {
+  if (!query.trim() || isLoading) return;
 
-    const userMessage = query.trim();
-    setQuery("");
-    setCharCount(0);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
+  const userMessage = query.trim();
+  setQuery("");
+  setCharCount(0);
+  if (textareaRef.current) textareaRef.current.style.height = "auto";
+  setIsLoading(true);
+  setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+
+  try {
+    // ── Create conversation on first message ──
+    let convId = currentConversationId;
+    if (!convId) {
+      const convRes = await fetch(`${API_BASE}/conversations`, { method: "POST" });
+      const convData = await convRes.json();
+      convId = convData.id;
+      setCurrentConversationId(convId);
+      setRefreshTrigger((n) => n + 1);
     }
-    setIsLoading(true);
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
 
-    try {
-      const res = await fetch(`${API_BASE}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          conversation_id: currentConversationId,
-          message: userMessage,
-        }),
-      });
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        conversation_id: convId,   // guaranteed int now
+        message: userMessage,
+      }),
+    });
 
-      if (!res.ok) {
-        setShowAlert(true);
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
-
-      if (data.conversation_id && !currentConversationId) {
-        setCurrentConversationId(data.conversation_id);
-        setRefreshTrigger((n) => n + 1);
-      }
-
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.response },
-      ]);
-    } catch (e) {
-      console.error(e);
-      setMessages((prev) => prev.slice(0, -1));
+    if (!res.ok) {
       setShowAlert(true);
-    } finally {
-      setIsLoading(false);
+      throw new Error(`HTTP ${res.status}`);
     }
-  };
+
+    const data = await res.json();
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: data.response },
+    ]);
+  } catch (e) {
+    console.error(e);
+    setMessages((prev) => prev.slice(0, -1));
+    setShowAlert(true);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
