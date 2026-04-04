@@ -7,3 +7,5 @@ frontend/node_modules
 chat.db
 backend/venv
 backend_venv/
+block_domains.json
+seen_urls
