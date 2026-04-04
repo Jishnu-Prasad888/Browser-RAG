@@ -42,7 +42,7 @@ def list_conversations():
     conn.close()
     return data
 
-@app.get("/api/messages/{conversation_id}")
+@app.get("/api/conversations/{conversation_id}/messages")
 def get_messages(conversation_id: int):
     conn = sqlite3.connect("chat.db")
     c = conn.cursor()
